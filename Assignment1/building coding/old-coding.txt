@@ -1,0 +1,660 @@
+int selectedOption = JOptionPane.showOptionDialog(null, "Player " + player + " , choose a" + type + " card" ,"Super Trumps Game : Deck has " + cards.size() + " Player has " + cardSet.size(), JOptionPane.NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, message , message[0]);
+
+ import javax.swing.*;
+ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.Random;
+ /* Created by Adam Cowie from 15/08/2016(SuperTrumps,SuperTrumpsCard,SuperTrumpsCards)
+  to 21/09/2016 (STCGame,STCDeck,STCCard,STCPlayer)
+   to 25/9/2016. (STCGame,STCCard,STCheck) */
+
+ /* Game starts.
+ Created list of 5 players.
+ 60 cards in cardSet with data added.
+ Cards move at random to cards arraylist.
+ 8 cards moved from deck to each players arraylist.
+ Weclome message displayed.
+ Game randomly selects dealer player, and starts with dealer +1(to left of dealer).
+ First card to play, if computer player, random card from player arraylist,
+ and random choice category, set category, set value of this cards category.
+ If human player, all cards for player list to choose, choice of category displayed,
+ and value of this cards category set.
+ If not first card, check category currently set, build list of cards to
+
+
+ and player is computer,
+
+
+
+
+
+
+
+ If last card played was a Trump category value is set to 0
+
+
+  */
+ public class STCGame {
+     // Allocate memory for vars and cards
+     private static int numOfCards = 60;
+     private static int numOfPlayers = 5;
+     private static int dealer = setDealer();
+     private static ArrayList<STCCard> cardSet = new ArrayList<>();
+     private static ArrayList<STCCard> cards = new ArrayList<>();
+ //    private static ArrayList<STCCard> cardSet = new ArrayList<>();
+     private static List<STCCard>[] players = new List[numOfPlayers];
+     private static STCheck check = new STCheck(0,0.00,false,"");
+
+     public static void main(String[] args) {
+         // Init game functions
+         setupPlayers();
+         setupCards();
+         dealCards();
+         // Display Welcome message
+         welcome();
+         // start hands with player left on dealer
+
+         try {
+             runGame();
+
+         } catch (IndexOutOfBoundsException e) {
+             System.err.println("IndexOutOfBoundsException: " + e.getMessage());
+             System.out.println("players= " + players.toString());
+             System.out.println("check.cardCheck= " + check.cardCheck);
+             System.out.println("check.prevCard= " + check.prevCard);
+             System.out.println("players[0].size()= " + players[0].size());
+             System.out.println("players[1].size()= " + players[1].size());
+             System.out.println("players[2].size()= " + players[2].size());
+             System.out.println("players[3].size()= " + players[3].size());
+             System.out.println("players[4].size()= " + players[4].size());
+             System.out.println("cardSet.size()= " + cardSet.size());
+             System.out.println("check.selection= " + check.selection);
+         }
+
+      //   runGame();
+     }
+
+     protected static void showHands(int player) {
+             String type = "";
+             boolean handHasCard=true;
+         cardSet.clear();
+             switch (check.cardCheck) {//check.cardCheck??????????
+                 case (0):
+                     type = "ny";//Player can select card type
+                     for (int i = 0; i < players[player].size(); i++) {
+              //           handCount++;
+                         cardSet.add(players[player].get(i));
+                    //     players[player].remove(0);
+                         handHasCard=true;
+                     }
+                     break;
+                 case (1):
+                     type = " Hardness";
+                     for (int i = 0; i < players[player].size(); i++) {
+                         if (check.prevCard < players[player].get(i).getHardness()) {
+             //                handCount++;
+                             cardSet.add(players[player].get(i));
+                     //        players[player].remove(i);
+                             handHasCard=true;
+                         }
+                     }
+                     break;
+                 case (2):
+                     type = " Gravity";
+                     for (int i = 0; i < players[player].size(); i++) {
+                         if (check.prevCard < players[player].get(i).getGravity()) {
+                   //          handCount++;
+                             cardSet.add(players[player].get(i));
+                      //       players[player].remove(i);
+                             handHasCard=true;
+                         }
+                     }
+                     break;
+                 case (3):
+                     type = " Cleavage";
+                     for (int i = 0; i < players[player].size(); i++) {
+                         if (check.prevCard < players[player].get(i).getCleavage()) {
+                   //          handCount++;
+                             cardSet.add(players[player].get(i));
+                       //      players[player].remove(i);
+                             handHasCard=true;
+                         }
+                     }
+                     break;
+                 case (4):
+                     type = " Abundance";
+                     for (int i = 0; i < players[player].size(); i++) {
+                         if (check.prevCard < players[player].get(i).getAbundance()) {
+                   //          handCount++;
+                             cardSet.add(players[player].get(i));
+                        //     players[player].remove(i);
+                             handHasCard=true;
+                         }
+                     }
+                     break;
+                 case (5):
+                     type = " Value";
+                     for (int i = 0; i < players[player].size(); i++) {
+                         if (check.prevCard < players[player].get(i).getValue()) {
+                    //         handCount++;
+                             cardSet.add(players[player].get(i));
+                       //      players[player].remove(i);
+                             handHasCard=true;
+                         }
+                     }
+                     break;
+             }
+             if (player == 0)// human player
+             {
+                 if (handHasCard) {
+                     String[] temp = new String[cardSet.size()];
+                     for (int j = 0; j < cardSet.size(); j++) {
+                         temp[j] = cardSet.get(j).toString();
+                     }
+                     check.selection = lookHand(temp, type, player);
+                     trump(player,check.selection);
+
+                     for (int j = 0; j < cardSet.size(); j++) {
+                         if (check.selection.startsWith(cardSet.get(j).getCardName())) {
+                   //          cardSet.remove(j);
+                             players[player].remove(j);
+                         }
+                     }
+                 } else {
+                     String[] temp = new String[1];
+                     temp[0] = "Collect a new card from the deck.";
+                     check.selection = lookHand(temp, type, player);
+                     cardSet.clear();
+                     dealCard(cardSet);
+                     players[player].add(cardSet.get(0));
+                 }
+             }
+             if (player != 0)// computer player
+             {
+                 if (cardSet.size() != 0) {
+
+                     int test=r(cardSet.size());
+
+                         check.selection = cardSet.get(test).toString();
+
+                     trump(player,check.selection);
+
+                     for (int i=0;i<cardSet.size();i++) {
+                         if (check.selection.equalsIgnoreCase(cardSet.get(i).toString())) {
+                             players[player].remove(i);
+                         }
+                     }
+                     cardSet.clear();
+
+                 } else {
+                     cardSet.clear();
+                     dealCard(cardSet);
+                     players[player].add(cardSet.get(0));
+                     check.selection = "Collected new card from deck: " + cardSet.get(0).toString();
+                 }
+             }
+             if (cards.size() != 0) {
+              //   for (int j = 0; j < cardSet.size(); j++) {
+            //         players[player].add(cardSet.get(j));
+            //         cardSet.remove(j);
+                 cardSet.clear();
+          //       }
+             } else {
+                 check.gameFinished=true;
+             }
+         cardSet.clear();
+             JOptionPane.showMessageDialog(null, "Player " + player + " played the card " + check.selection + "\n with Category Type \"" + cats(check.cardCheck) + "\" and a value of " + check.prevCard, "Super Trumps Game : Player " + player + " has " + players[player].size() + " cards left.", JOptionPane.PLAIN_MESSAGE);
+
+         if (players[player].size()<1){check.gameFinished=true;}
+     }
+
+     protected static String cats(int check)
+     {
+         String cats="";
+         switch (check)
+         {
+             case (1):cats="Hardness";break;
+             case (2):cats="Gravity";break;
+             case (3):cats="Cleavage";break;
+             case (4):cats="Abundance";break;
+             case (5):cats="Value";break;
+
+         }
+         return cats;
+     }
+     protected static void category()//called for human player to select Category option
+     {
+         String[] cats = new String[5];
+         cats[0]="Hardness";cats[1]="Gravity";cats[2]="Cleavage";cats[3]="Abundance";cats[4]="Value";
+         String temp = (String)JOptionPane.showInputDialog(null, "Choose a Category to change to.", "Super Trumps Game : Deck has " + cards.size() + " cards.", JOptionPane.PLAIN_MESSAGE, null, cats, cats[0]);
+         if(temp.equalsIgnoreCase("Hardness")){check.cardCheck=1;}
+         if(temp.equalsIgnoreCase("Gravity")){check.cardCheck=2;}
+         if(temp.equalsIgnoreCase("Cleavage")){check.cardCheck=3;}
+         if(temp.equalsIgnoreCase("Abundance")){check.cardCheck=4;}
+         if(temp.equalsIgnoreCase("Value")){check.cardCheck=5;}
+     }
+     protected static void trump(int player, String selection)//handle trump card plays
+     {
+         boolean found=false;
+         if (selection.startsWith("THE GEMMOLOGIST")){check.cardCheck=1;check.prevCard=0;found=true;}
+         if (selection.startsWith("THE GEOPHYSICIST")){check.cardCheck=2;check.prevCard=0;found=true;}
+         if (selection.startsWith("THE MINERALOGIST")){check.cardCheck=3;check.prevCard=0;found=true;}
+         if (selection.startsWith("THE PETROLOGIST")){check.cardCheck=4;check.prevCard=0;found=true;}
+         if (selection.startsWith("THE MINER")){check.cardCheck=5;check.prevCard=0;found=true;}
+         if (selection.startsWith("THE GEOLOGIST")&&player==0){category();check.prevCard=0;found=true;}
+         if (selection.startsWith("THE GEOLOGIST")&&player!=0){check.cardCheck=r(5);check.prevCard=0;found=true;}
+         if (found==false)
+         {
+             for (int j = 0; j < cardSet.size(); j++) {
+                 if (selection.startsWith(cardSet.get(j).getCardName()))
+                 {
+                     if(check.cardCheck==0){check.cardCheck=r(5);}
+                     if(check.cardCheck==1){check.prevCard=cardSet.get(j).getHardness();}
+                     if(check.cardCheck==2){check.prevCard=cardSet.get(j).getGravity();}
+                     if(check.cardCheck==3){check.prevCard=cardSet.get(j).getCleavage();}
+                     if(check.cardCheck==4){check.prevCard=cardSet.get(j).getAbundance();}
+                     if(check.cardCheck==5){check.prevCard=cardSet.get(j).getValue();}
+                 }
+             }
+         }
+     }
+     protected static String lookHand(String message[]){return(String)JOptionPane.showInputDialog(null, "Choose a card", "Super Trumps Game : Deck has " + cards.size() + " cards.", JOptionPane.PLAIN_MESSAGE, null, message, message[0]);
+     }
+
+     protected static String lookHand(String message[],String type){return(String)JOptionPane.showInputDialog(null, "Choose a" + type + " card", "Super Trumps Game : Deck has " + cards.size() + " cards.", JOptionPane.PLAIN_MESSAGE, null, message, message[0]);
+     }
+
+     protected static String lookHand(String message[],String type,int player){return(String)JOptionPane.showInputDialog(null, "Player " + player + " , choose a" + type + " card", "Super Trumps Game : Deck has " + cards.size() + " Player has " + cardSet.size(), JOptionPane.PLAIN_MESSAGE, null, message, message[0]);
+     }
+
+     protected static void runGame()
+     {
+         int i;
+         if(dealer==5){i=0;}else{i=dealer+1;}// control players turns
+         do {
+             showHands(i++);// Game hand control - playing game
+             if(i==5){i=0;}
+         }while(!check.getGameFinished());
+         // Check winning player
+         JOptionPane.showMessageDialog(null, "Congrats to Player " + winner(), "Super Trumps Game", JOptionPane.PLAIN_MESSAGE);
+         // Display Finished message
+         JOptionPane.showMessageDialog(null, "Thanks for playing my Super Trumps Game", "Super Trumps Game", JOptionPane.PLAIN_MESSAGE);
+     }
+     protected static int winner()
+     {
+         int win=10;
+         for(int i=0;i<numOfPlayers;i++){if(players[i].size()<win){win=players[i].size();}}
+         return win;
+     }
+     protected static void display(String message){JOptionPane.showMessageDialog(null, message , "Super Trumps Game : Deck has " + cards.size() + " cards.", JOptionPane.PLAIN_MESSAGE);}
+     private static void welcome()
+     {
+         UIManager.put("OptionPane.okButtonText", "Next");
+         JOptionPane.showMessageDialog(null, "Welcome to the Super Trumps Game", "Super Trumps Game", JOptionPane.PLAIN_MESSAGE);
+         JOptionPane.showMessageDialog(null, "This game has one human player, and 4 computer players", "Super Trumps Game", JOptionPane.PLAIN_MESSAGE);
+         JOptionPane.showMessageDialog(null, "The Dealer player is number: " + dealer, "Super Trumps Game", JOptionPane.PLAIN_MESSAGE);
+         JOptionPane.showMessageDialog(null, "Cards are shuffled and each player has been dealt 8 cards", "Super Trumps Game : Deck has " + cards.size() + " cards.", JOptionPane.PLAIN_MESSAGE);
+     }
+     protected static int setDealer(){return r(numOfPlayers)-1;}
+     protected static void setupPlayers(){for (int i=0;i<numOfPlayers;i++) {players[i] = new ArrayList<>();}}
+     protected static void dealCards()
+     {
+         for(int i=0;i<8;i++)// deal 8 cards
+         {
+             for(int j=0;j<numOfPlayers;j++)// 5 players
+             {
+                 players[j].add(cards.get(0));//get card from cards deck copy to players hand
+                 cards.remove(0);//remove card from cards deck
+             }
+         }
+     }
+     protected static void dealCard(ArrayList<STCCard> temp)
+     {
+         temp.add(cards.get(0));//get card from cards deck copy to temp deck
+         cards.remove(0);//remove card from cards deck
+     }
+
+     protected static void shuffleCards()
+     {
+         for(int i=0;i<numOfCards;i++)//60 cards move from cardSet to cards with random positions
+         {
+             int t = r(cardSet.size()-1);//pick random card from cardSet
+             cards.add(cardSet.get(t));//copy card from cardSet to cards
+         //    cards.add(i,cardSet.get(t));
+             cardSet.remove(t);//delete card from cardSet
+         }
+     }
+     protected static int r(int max) {
+         int min=0;
+         Random rand = new Random(System.currentTimeMillis());
+         return rand.nextInt((max - min) + 1) + min;
+     }
+
+     protected static void setupCards()
+     {
+         cardSet.add(new STCCard("QUARTZ", "MINERAL", "SiO2", "Tectosilicate", "Hexagonal", "Igneous, Metamorphic, Sedimentary", 7.0, 2.65, 2, 5, 3));
+         cardSet.add(new STCCard("PLAGIOCLASE", "MINERAL", "NaAlSi3O8 - CaAl2Si2O8", "Tectosilicate", "Triclinic", "Igneous, Metamorphic, Sedimentary", 6.5, 2.8, 10, 6, 3));
+         cardSet.add(new STCCard("ORTHOCLASE", "MINERAL", "KAlSi3O8", "Tectosilicate", "Monoclinic", "Igneous, Metamorphic, Sedimentary", 6.5, 2.6, 10, 5, 3));
+         cardSet.add(new STCCard("BIOTITE", "MINERAL", "K(Fe,Mg)3AlSi3O10(OH)2", "Phyllosilicate", "Monoclinic", "Igneous, Metamorphic", 3.0, 3.3, 9, 4, 2));
+         cardSet.add(new STCCard("MUSCOVITE", "MINERAL", "KAl3Si3O10(OH)2", "Phyllosilicate", "Monoclinic", "Igneous, Metamorphic", 3.0, 2.9, 9, 4, 3));
+         cardSet.add(new STCCard("HORNBLENDE", "MINERAL", "Ca2(Mg,Fe)4Al2Si7O22(OH)2", "Inosilicate", "Monoclinic", "Igneous, Metamorphic", 6.0, 3.5, 7, 4, 1));
+         cardSet.add(new STCCard("ACTINOLITE", "MINERAL", "Ca2(Mg,Fe)5Si8O22(OH)2", "Inosilicate", "Monoclinic", "Metamorphic", 6.0, 3.5, 7, 3, 2));
+         cardSet.add(new STCCard("GLAUCOPHANE", "MINERAL", "Na2(Mg,Fe)3Al2Si8O22(OH)2", "Inosilicate", "Monoclinic", "Metamorphic", 6.0, 3.2, 7, 3, 1));
+         cardSet.add(new STCCard("OLIVINE", "MINERAL", "(Mg,Fe)2SiO4", "Nesosilicate", "Orthorhombic", "Igneous, Metamorphic, Mantle", 7.0, 4.4, 4, 5, 2));
+         cardSet.add(new STCCard("GARNET", "MINERAL", "(Fe,Mg,Ca,Mn)3(Al,Fe)2Si3O12", "Nesosilicate", "Isometric", "Igneous, Metamorphic, Mantle", 7.5, 4.3, 1, 4, 3));
+         cardSet.add(new STCCard("TITANITE", "MINERAL", "CaTiSiO5", "Nesosilicate", "Monoclinic", "Igneous, Metamorphic", 5.5, 3.6, 8, 3, 2));
+         cardSet.add(new STCCard("ZIRCON", "MINERAL", "ZrSiO4", "Nesosilicate", "Tetragonal", "Igneous, Metamorphic, Sedimentary", 7.5, 4.7, 4, 2, 3));
+         cardSet.add(new STCCard("AUGITE", "MINERAL", "Ca(Mg,Fe)Si2O6", "Inosilicate", "Monoclinic", "Igneous, Metamorphic", 6.5, 3.6, 7, 5, 1));
+         cardSet.add(new STCCard("ORTHOPYROXENE", "MINERAL", "(Mg,Fe)2Si2O6", "Inosilicate", "Orthorhombic", "Igneous, Metamorphic, Mantle", 6.0, 3.9, 7, 5, 1));
+         cardSet.add(new STCCard("CHLORITE", "MINERAL", "(Mg,Fe)5Al2Si3O10(OH)8", "Phyllosilicate", "Monoclinic", "Metamorphic", 3.0, 3.3, 9, 4, 2));
+         cardSet.add(new STCCard("ANTIGORITE", "MINERAL", "(Mg,Fe)3Si2O5(OH)4", "Phyllosilicate", "Monoclinic", "Metamorphic, Mantle", 4.0, 2.6, 9, 3, 2));
+         cardSet.add(new STCCard("TALC", "MINERAL", "Mg3Si4O10(OH)2", "Phyllosilicate", "Monoclinic", "Metamorphic", 1.0, 2.8, 9, 3, 3));
+         cardSet.add(new STCCard("KAOLINITE", "MINERAL", "Al2Si2O5(OH)", "Phyllosilicate", "Triclinic", "Sedimentary", 2.5, 2.7, 9, 4, 4));
+         cardSet.add(new STCCard("ANDALUSITE", "MINERAL", "Al2SiO5", "Nesosilicate", "Orthorhombic", "Metamorphic", 7.0, 3.15, 7, 3, 3));
+         cardSet.add(new STCCard("KYANITE", "MINERAL", "Al2SiO5", "Nesosilicate", "Triclinic", "Metamorphic", 7.0, 3.7, 10, 2, 3));
+         cardSet.add(new STCCard("SILLIMANITE", "MINERAL", "Al2SiO5", "Nesosilicate", "Orthorhombic", "Igneous, Metamorphic", 7.5, 3.25, 10, 3, 2));
+         cardSet.add(new STCCard("STAUROLITE", "MINERAL", "(Fe,Mg)2Al9Si4O22(OH)2", "Nesosilicate", "Metamorphic", "Metamorphic", 7.0, 3.8, 5, 2, 2));
+         cardSet.add(new STCCard("EPIDOTE", "MINERAL", "Ca2(Al,Fe)3Si3O12(OH)", "Sorosilicate", "Monoclinic", "Igneous, Metamorphic", 6.5, 3.5, 9, 4, 1));
+         cardSet.add(new STCCard("TOURMALINE", "MINERAL", "Na(Mg,Fe)3Al6B3Si6O27(OH)4", "Cyclosilicate", "Hexagonal", "Metamorphic", 7.5, 3.2, 4, 2, 3));
+         cardSet.add(new STCCard("TOPAZ", "MINERAL", "Al2SiO4(F,OH)2", "Nesosilicate", "Orthorhombic", "Metamorphic, Sedimentary", 8.0, 3.6, 9, 1, 2));
+         cardSet.add(new STCCard("BERYL", "MINERAL", "Be3Al2Si6O18", "Cyclosilicate", "Hexagonal", "Igneous, Metamorphic", 8.0, 2.9, 3, 2, 3));
+         cardSet.add(new STCCard("PYRITE", "MINERAL", "FeS2", "Sulfide", "Isometic", "Igneous, Metamorphic", 6.5, 5.0, 4, 3, 3));
+         cardSet.add(new STCCard("PYRRHOTITE", "MINERAL", "Fe1-xS", "Sulfide", "Monoclinic", "Igneous, Metamorphic", 4.5, 4.6, 1, 3, 3));
+         cardSet.add(new STCCard("CHALCOPYRITE", "MINERAL", "CuFeS2", "Sulfide", "Tetragonal", "Igneous, Metamorphic", 4.0, 4.3, 4, 3, 5));
+         cardSet.add(new STCCard("GALENA", "MINERAL", "PbS", "Sulfide", "Isometic", "Metamorphic", 2.5, 7.6, 13, 2, 4));
+         cardSet.add(new STCCard("SPHALERITE", "MINERAL", "(Zn,Fe)S", "Sulfide", "Isometic", "Metamorphic", 4.0, 4.1, 15, 2, 4));
+         cardSet.add(new STCCard("MOLYBDENITE", "MINERAL", "MoS2", "Sulfide", "Hexagonal", "Igneous, Metamorphic", 1.5, 4.7, 9, 2, 4));
+         cardSet.add(new STCCard("GOLD", "MINERAL", "Au", "Naive Element", "Isometic", "Metamorphic, Sedimentary", 3.0, 19.3, 1, 1, 6));
+         cardSet.add(new STCCard("DIAMOND", "MINERAL", "C", "Naive Element", "Isometic", "Igneous, Metamorphic, Sedimentary", 10.0, 3.5, 14, 1, 6));
+         cardSet.add(new STCCard("GRAPHITE", "MINERAL", "C", "Naive Element", "Hexagonal", "Metamorphic, Sedimentary", 2.0, 2.2, 9, 2, 3));
+         cardSet.add(new STCCard("HALITE", "MINERAL", "NaCl", "Halide", "Isometic", "Sedimentary", 2.5, 2.2, 13, 2, 3));
+         cardSet.add(new STCCard("FLUORITE", "MINERAL", "CaF2", "Halide", "Isometic", "Metamorphic", 4.0, 3.2, 14, 2, 3));
+         cardSet.add(new STCCard("GYPSUM", "MINERAL", "CaSO4(H2O)2", "Sulfide", "Monoclinic", "Metamorphic, Sedimentary", 2.0, 2.3, 11, 2, 4));
+         cardSet.add(new STCCard("BARITE", "MINERAL", "BaSO4", "Sulfide", "Orthorhombic", "Metamorphic, Sedimentary", 3.5, 4.5, 12, 2, 3));
+         cardSet.add(new STCCard("APATITE", "MINERAL", "Ca5(PO4)3(OH,F,Cl)", "Phosphate", "Hexagonal", "Igneous, Metamorphic, Sedimentary", 5.0, 3.2, 4, 3, 4));
+         cardSet.add(new STCCard("MONAZITE", "MINERAL", "(La,Ce,Nd)PO4", "Phosphate", "Monoclinic", "Igneous, Metamorphic, Sedimentary", 5.0, 5.3, 6, 2, 3));
+         cardSet.add(new STCCard("CALCITE", "MINERAL", "CaCO3", "Carbonate", "Hexagonal", "Igneous, Metamorphic, Sedimentary", 3.0, 2.7, 13, 4, 4));
+         cardSet.add(new STCCard("DOLOMITE", "MINERAL", "CaMg(CO3)2", "Carbonate", "Hexagonal", "Metamorphic, Sedimentary", 4.0, 2.9, 13, 3, 2));
+         cardSet.add(new STCCard("MAGNESITE", "MINERAL", "MgCO3", "Carbonate", "Hexagonal", "Metamorphic, Sedimentary", 4.0, 3.0, 13, 3, 3));
+         cardSet.add(new STCCard("SIDERITE", "MINERAL", "FeCO3", "Carbonate", "Hexagonal", "Metamorphic, Sedimentary", 4.5, 4.0, 13, 2, 3));
+         cardSet.add(new STCCard("MAGNETITE", "MINERAL", "Fe3O4", "Oxide (Spinel)", "Isometic", "Igneous, Metamorphic, Sedimentary", 6.0, 5.2, 1, 4, 5));
+         cardSet.add(new STCCard("HEMATITE", "MINERAL", "Fe2O3", "Oxide", "Hexagonal", "Metamorphic, Sedimentary", 6.0, 5.3, 1, 2, 4));
+         cardSet.add(new STCCard("CHROMITE", "MINERAL", "(Fe,Mg)Cr2O4", "Oxide (Spinel)", "Isometic", "Igneous, Sedimentary", 5.5, 5.1, 1, 3, 4));
+         cardSet.add(new STCCard("ILMENITE", "MINERAL", "TiFeO3", "Oxide", "Hexagonal", "Igneous, Metamorphic, Sedimentary", 6.0, 4.8, 1, 3, 3));
+         cardSet.add(new STCCard("RUTILE", "MINERAL", "TiO2", "Oxide", "Tetragonal", "Metamorphic, Sedimentary", 6.5, 4.3, 7, 3, 4));
+         cardSet.add(new STCCard("CORUNDUM", "MINERAL", "Al2O3", "Oxide", "Hexagonal", "Metamorphic, Sedimentary", 9.0, 4.0, 1, 2, 3));
+         cardSet.add(new STCCard("CASSITERITE", "MINERAL", "SnO2", "Oxide", "Tetragonal", "Igneous, Metamorphic, Sedimentary", 7.0, 7.1, 6, 2, 4));
+         cardSet.add(new STCCard("GIBBSITE", "MINERAL", "Al(OH)3", "Hydroxide", "Monoclinic", "Metamorphic, Sedimentary", 3.5, 2.4, 9, 3, 4));
+         cardSet.add(new STCCard("GOETHITE", "MINERAL", "FeO(OH)", "Hydroxide", "Orthorhombic", "Sedimentary", 5.5, 4.3, 10, 4, 3));
+         cardSet.add(new STCCard("THE MINER", "TRUMP", " ", "Change category to Economic Value", " ", " ", 11.0, 20.0, 16, 7, 7));
+         cardSet.add(new STCCard("THE PETROLOGIST", "TRUMP", " ", "Change category to Crustal Abundance", " ", " ", 11.0, 20.0, 16, 7, 7));
+         cardSet.add(new STCCard("THE GEMMOLOGIST", "TRUMP", " ", "Change category to Hardness", " ", " ", 11.0, 20.0, 16, 7, 7));
+         cardSet.add(new STCCard("THE MINERALOGIST", "TRUMP", " ", "Change category to Cleavage", " ", " ", 11.0, 20.0, 16, 7, 7));
+         cardSet.add(new STCCard("THE GEOPHYSICIST", "TRUMP", " ", "Change category to Specific Gravity, or throw Magnetite", " ", " ", 11.0, 20.0, 16, 7, 7));
+         cardSet.add(new STCCard("THE GEOLOGIST", "TRUMP", " ", "Change category to Your Choice", " ", " ", 11.0, 20.0, 16, 7, 7));
+         shuffleCards();
+     }
+ }
+
+ /*               switch (cardCheck) {
+                    case (0):type = "ny";//pc grabs first card and i will change to lowest card of type
+                        selection=cardSet.get(0).toString();cardSet.remove(0);break;
+
+                        for (int j=0;j<cardSet.size();j++) {
+                            if (cardSet.get(j).getCardName()==cardSet.get(j).getCardName()){cardSet.remove(j);}
+                        }
+
+                        for (int i = 0; i < players[player].size(); i++) {
+                            handCount++;
+                            cardSet.add(players[player].get(i));
+                            players[player].remove(i);
+                        }
+                        break;
+                    case (1):
+                        type = " Hardness";
+                        for (int i = 0; i < players[player].size(); i++) {
+                            if (prevCard < players[player].get(i).getHardness()) {
+                                handCount++;
+                                cardSet.add(players[player].get(i));
+                                players[player].remove(i);
+                            }
+                        }
+                        break;
+                    case (2):
+                        type = " Gravity";
+                        for (int i = 0; i < players[player].size(); i++) {
+                            if (prevCard < players[player].get(i).getGravity()) {
+                                handCount++;
+                                cardSet.add(players[player].get(i));
+                                players[player].remove(i);
+                            }
+                        }
+                        break;
+                    case (3):
+                        type = " Cleavage";
+                        for (int i = 0; i < players[player].size(); i++) {
+                            if (prevCard < players[player].get(i).getCleavage()) {
+                                handCount++;
+                                cardSet.add(players[player].get(i));
+                                players[player].remove(i);
+                            }
+                        }
+                        break;
+                    case (4):
+                        type = " Abundance";
+                        for (int i = 0; i < players[player].size(); i++) {
+                            if (prevCard < players[player].get(i).getAbundance()) {
+                                handCount++;
+                                cardSet.add(players[player].get(i));
+                                players[player].remove(i);
+                            }
+                        }
+                        break;
+                    case (5):
+                        type = " Value";
+                        for (int i = 0; i < players[player].size(); i++) {
+                            if (prevCard < players[player].get(i).getValue()) {
+                                handCount++;
+                                cardSet.add(players[player].get(i));
+                                players[player].remove(i);
+                            }
+                        }
+                        break;
+                }
+*/
+
+
+
+       //         for (int j=0;j<players[player].size();j++){if(a.startsWith(players[player].get(j).getCardName())){players[player].remove(j);}}
+       //         JOptionPane.showMessageDialog(null, "A= " + a.toString(), "Super Trumps Game", JOptionPane.PLAIN_MESSAGE);
+                // if(players[player].size()==0){gameFinished=true;}
+       //     }
+       //     players[player].remove(a);
+//           JOptionPane.showMessageDialog(null, "cardCheck!=0&&prevCard!=0&&player==1 = standard hand for Human", "Super Trumps Game : " + players[player].size(), JOptionPane.PLAIN_MESSAGE);cardCheck=3;prevCard=2;
+   //     }
+  //      if(cardCheck!=0&&prevCard==0&&player!=0)//new hand for PC
+ //       {JOptionPane.showMessageDialog(null, "cardCheck!=0&&prevCard==0&&player!=1 = new hand for PC", "Super Trumps Game : " + players[player].size(), JOptionPane.PLAIN_MESSAGE);cardCheck=2;prevCard=1;}
+ //       if(cardCheck!=0&&prevCard!=0&&player!=0)//standard hand for PC
+ //       {JOptionPane.showMessageDialog(null, "cardCheck!=0&&prevCard!=0&&player!=1 = standard hand for PC", "Super Trumps Game : " + players[player].size(), JOptionPane.PLAIN_MESSAGE);cardCheck=4;prevCard=3;}
+
+      //  if(players[player].size()<1){
+   //         JOptionPane.showMessageDialog(null, "player number= " + player + " hand size= " + players[player].size(), "Super Trumps Game", JOptionPane.PLAIN_MESSAGE);// }gameFinished=true;
+
+   //     String a = "";
+        //    String getCardName()
+        //     double getHardness
+        //      double getGravity()
+        //       int getCleavage()
+        //      int getAbundance()
+        //      int getValue()
+        //  cardCheck = {"Hardness","Gravity","Cleavage","Abundance","Value"};
+        /*
+        for (int i = 0; i < players[player].size(); i++) {
+            switch (cardCheck) {
+                case (0): {
+                    String[] temp = new String[players[player].size()];
+                    for (int j = 0; j < players[player].size(); j++) {
+                        temp[j] = players[player].get(j).toString();
+                    }
+                    a = lookHand(temp);
+                }
+                break;
+                case (1): {
+                    String[] temp = new String[players[player].size()];
+                    for (int j = 0; j < players[player].size(); j++) {
+                        temp[j] = players[player].get(j).toString();
+                    }
+                    a = lookHand(temp);
+                }
+                break;
+                case (2): {
+                    String[] temp = new String[players[player].size()];
+                    for (int j = 0; j < players[player].size(); j++) {
+                        temp[j] = players[player].get(j).toString();
+                    }
+                    a = lookHand(temp);
+                }
+                break;
+                case (3): {
+                    String[] temp = new String[players[player].size()];
+                    for (int j = 0; j < players[player].size(); j++) {
+                        temp[j] = players[player].get(j).toString();
+                    }
+                    a = lookHand(temp);
+                }
+                break;
+                case (4): {
+                    String[] temp = new String[players[player].size()];
+                    for (int j = 0; j < players[player].size(); j++) {
+                        temp[j] = players[player].get(j).toString();
+                    }
+                    a = lookHand(temp);
+                }
+                break;
+                default:
+                    display("ERROR");
+                    //       players[player].get(i).getHardness();
+                    //       players[player].get(i).getAbundance();
+            }
+        }*/
+
+/*
+                        if(handCount!=0)
+                        {
+                            String[]temp=new String[cardSet.size()];
+                            for(int j=0;j<cardSet.size();j++){temp[j]=cardSet.get(j).toString();}
+                            selection=lookHand(temp,type);
+                            for (int j=0;j<cardSet.size();j++){if(selection.startsWith(cardSet.get(j).getCardName())){cardSet.remove(j);}}
+                        }
+                        else{String[]temp=new String[1];temp[0]="Collect a new card from the deck.";selection=lookHand(temp,type);dealCard(cardSet);}
+                        for (int j=0;j<cardSet.size();j++) {
+                            players[player].add(cardSet.get(j));
+                            cardSet.remove(j);
+                        }break;
+
+                    case (11): if(prevCard<players[player].get(i).getGravity())
+                    {String[]temp=new String[players[player].size()];for(int j=0;j<players[player].size();j++){temp[j]=players[player].get(j).toString();}a = lookHand(temp,"Gravity");}break;
+
+                    case (12): if(prevCard<players[player].get(i).getCleavage())
+                    {String[]temp=new String[players[player].size()];for(int j=0;j<players[player].size();j++){temp[j]=players[player].get(j).toString();}a = lookHand(temp,"Cleavage");}break;
+
+                    case (13): if(prevCard<players[player].get(i).getAbundance())
+                    {String[]temp=new String[players[player].size()];for(int j=0;j<players[player].size();j++){temp[j]=players[player].get(j).toString();}a = lookHand(temp,"Abundance");}break;
+
+                    case (14): if(prevCard<players[player].get(i).getValue())
+                    {String[]temp=new String[players[player].size()];for(int j=0;j<players[player].size();j++){temp[j]=players[player].get(j).toString();}a = lookHand(temp,"Value");}break;*/
+
+
+/*
+        if(cardCheck==0&&prevCard==0&&player==0)//first hand for Human
+        {JOptionPane.showMessageDialog(null, "cardCheck==0&&prevCard==0&&player==1 = first hand for Human", "Super Trumps Game", JOptionPane.PLAIN_MESSAGE);cardCheck=1;}
+        if(cardCheck==0&&prevCard==0&&player!=0)//first hand for PC
+        {JOptionPane.showMessageDialog(null, "cardCheck==0&&prevCard==0&&player!=1 = first hand for PC", "Super Trumps Game", JOptionPane.PLAIN_MESSAGE);}
+        if(cardCheck!=0&&prevCard==0&&player==0)//new hand for Human
+        {JOptionPane.showMessageDialog(null, "cardCheck!=0&&prevCard==0&&player==1 = new hand for Human", "Super Trumps Game", JOptionPane.PLAIN_MESSAGE);cardCheck=1;prevCard=1;}
+        if(cardCheck!=0&&prevCard!=0&&player==0)//standard hand for Human
+        {
+        */
+            // player 1
+            // type to check
+            // get list of higher cards
+            // remove cards from full list to usable list
+            // now build list to display
+            // if no cards to show, show pass function with card pickup from card deck
+            // get card choice
+            // set card values for game
+            // remove card from list
+            // add remaining cards back to player hand
+
+
+    //  hands();
+    // get player hand
+    // get cardCheck
+    // if prevCard==0 && cardCheck==0 display all cards to current player with all values and ask the player to choose a card and which cardCheck value to set
+    // if prevCard==0 && cardCheck!=0 display all cards to current player with only the cardCheck available for the player to choose
+    // if prevCard!=0 && cardCheck!=0 display only high cardCheck cards to current player with only the cardCheck available for the player to choose
+    // if player has no cards with value higher then prevCard for cardCheck, display collect a card function.
+    // and ask the player to choose a card and which cardCheck value to set
+    // player chooses card
+    //
+
+/*
+        String[] message1={"Hardness","Gravity","Cleavage","Abundance","Value"};
+
+        UIManager.put("OptionPane.cancelButtonText", "Pass and Pickup");
+        UIManager.put("OptionPane.okButtonText", "Pass");
+        JOptionPane.showInputDialog(null, "Choose a card", "Super Trumps Game : Deck has " + cards.size() + " cards.", JOptionPane.PLAIN_MESSAGE, null, message1,message1);
+
+
+
+        do {
+            if(i>numOfPlayers){i=1;}
+            if(prevCard==0)
+            {
+
+            }
+     //       showHand(i,0,0);
+            if(cards.size()>0){JOptionPane.showMessageDialog(null,cards.get(0), "Super Trumps Game : Deck has " + cards.size() + " cards.", JOptionPane.PLAIN_MESSAGE);cards.remove(0);}
+            if(cards.size()==0){gameFinished=true;}
+            i++;
+
+        }while(!gameFinished);
+        // Display Finished message
+        JOptionPane.showMessageDialog(null, "Thanks for playing my Super Trumps Game", "Super Trumps Game", JOptionPane.PLAIN_MESSAGE);*/
+
+
+play card and choose type
+
+next player if has same type/higher card or trump, player can play card or pass round, but if has no higher card must pass and pickup a new card from deck
+if  trump card used, change type to new type and set new value to 0, back to loop
+loop game until a player has no cards or one set of hands after deck has no cards left
+
+//  hands();
+    // get player hand
+    // get cardCheck
+    // if prevCard==0 && cardCheck==0 display all cards to current player with all values and ask the player to choose a card and which cardCheck value to set
+    // if prevCard==0 && cardCheck!=0 display all cards to current player with only the cardCheck available for the player to choose
+    // if prevCard!=0 && cardCheck!=0 display only high cardCheck cards to current player with only the cardCheck available for the player to choose
+    // if player has no cards with value higher then prevCard for cardCheck, display collect a card function.
+    // and ask the player to choose a card and which cardCheck value to set
+    // player chooses card
+
+
+use player cards / build card list from check / display this list
+
+ArrayList<STCCard>[] Players = new ArrayList<STCCard>()[4]
+ArrayList<ArrayList<STCCard>> players = new ArrayList<ArrayList<STCCard>>(5);
+
+public static ArrayList<STCCard> player1 = new ArrayList<>();
+
+List<List<STCCard>> players = new ArrayList<List<STCCard>>(5);
+
+ArrayList<STCCard>[] players = (ArrayList<STCCard>[])new ArrayList[5];
+
+class Players extends ArrayList<Players> {
+}
+IndividualList[] group = new IndividualList[10];
+
+ArrayList<STCCard>[] players = new ArrayList[5];
+
+List<Integer>[] players = (ArrayList<STCCard>[])new ArrayList[5];
