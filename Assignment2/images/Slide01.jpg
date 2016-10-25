@@ -1,0 +1,144 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
+
+public class JGridLayout extends JFrame {
+    static JFrame frame;
+    private JButton nb = new JButton();
+    private JButton sb = new JButton();
+    private JButton eb = new JButton();
+    private JButton wb = new JButton();
+    private JButton ab = new JButton();
+    private JButton fb = new JButton();
+    private JButton bb = new JButton();
+    private JButton vb = new JButton();
+    private JButton lb = new JButton();
+    private JButton cb = new JButton();
+
+    public JGridLayout() throws IOException {
+        setLayout(new GridLayout(2, 3, 2, 4));
+
+        BufferedImage nbimg = ImageIO.read(new File("//images//Slide01.jpg"));
+        ImageIcon nbicon = new ImageIcon(nbimg);
+        nb.setIcon(nbicon);
+        add(nb);
+        nb.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JDialog d = new JDialog(frame, "Hello", true);
+                d.setLocationRelativeTo(frame);
+                d.setVisible(true);
+            }
+        });
+        BufferedImage sbimg = ImageIO.read(new File("./images/Slide02.jpg"));
+        ImageIcon sbicon = new ImageIcon(sbimg);
+        sb.setIcon(sbicon);
+        add(sb);
+        sb.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JDialog d = new JDialog(frame, "Hello", true);
+                d.setLocationRelativeTo(frame);
+                d.setVisible(true);
+            }
+        });
+        BufferedImage ebimg = ImageIO.read(new File("//images2//Slide03.jpg"));
+        ImageIcon ebicon = new ImageIcon(ebimg);
+        eb.setIcon(ebicon);
+        add(eb);
+        eb.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JDialog d = new JDialog(frame, "Hello", true);
+                d.setLocationRelativeTo(frame);
+                d.setVisible(true);
+            }
+        });
+        BufferedImage wbimg = ImageIO.read(new File(".//images2//Slide04.jpg"));
+        ImageIcon wbicon = new ImageIcon(wbimg);
+        wb.setIcon(wbicon);
+        add(wb);
+        wb.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JDialog d = new JDialog(frame, "Hello", true);
+                d.setLocationRelativeTo(frame);
+                d.setVisible(true);
+            }
+        });
+        BufferedImage cbimg = ImageIO.read(new File("images2//Slide05.jpg"));
+        ImageIcon cbicon = new ImageIcon(cbimg);
+        cb.setIcon(cbicon);
+        add(cb);
+        cb.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JDialog d = new JDialog(frame, "Hello", true);
+                d.setLocationRelativeTo(frame);
+                d.setVisible(true);
+            }
+        });
+        BufferedImage abimg = ImageIO.read(new File("./images2//Slide06.jpg"));
+        ImageIcon abicon = new ImageIcon(abimg);
+        ab.setIcon(abicon);
+        add(ab);
+        ab.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JDialog d = new JDialog(frame, "Hello", true);
+                d.setLocationRelativeTo(frame);
+                d.setVisible(true);
+            }
+        });
+        BufferedImage fbimg = ImageIO.read(new File(".//images2/Slide07.jpg"));
+        ImageIcon fbicon = new ImageIcon(fbimg);
+        fb.setIcon(fbicon);
+        add(fb);
+        fb.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JDialog d = new JDialog(frame, "Hello", true);
+                d.setLocationRelativeTo(frame);
+                d.setVisible(true);
+            }
+        });
+        BufferedImage vbimg = ImageIO.read(new File("../images2/Slide08.jpg"));
+        ImageIcon vbicon = new ImageIcon(vbimg);
+        vb.setIcon(vbicon);
+        add(vb);
+        vb.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JDialog d = new JDialog(frame, "Hello", true);
+                d.setLocationRelativeTo(frame);
+                d.setVisible(true);
+            }
+        });
+        BufferedImage bbimg = ImageIO.read(new File("..//images2//Slide09.jpg"));
+        ImageIcon bbicon = new ImageIcon(bbimg);
+        bb.setIcon(bbicon);
+        add(bb);
+        bb.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JDialog d = new JDialog(frame, "Hello", true);
+                d.setLocationRelativeTo(frame);
+                d.setVisible(true);
+            }
+        });
+        BufferedImage lbimg = ImageIO.read(new File("images2/Slide10.jpg"));
+        ImageIcon lbicon = new ImageIcon(lbimg);
+        lb.setIcon(lbicon);
+        add(lb);
+        lb.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JDialog d = new JDialog(frame, "Hello", true);
+                d.setLocationRelativeTo(frame);
+                d.setVisible(true);
+            }
+        });
+        setSize(1500, 840);
+        setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    public static void main(String[] ags) throws IOException {
+        JGridLayout jbl = new JGridLayout();
+    }
+}
